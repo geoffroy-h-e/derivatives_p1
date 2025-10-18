@@ -1,4 +1,4 @@
-# q4_a.py — robust to older q3 schema
+# q4_a.py 
 from __future__ import annotations
 
 import pandas as pd
@@ -53,7 +53,7 @@ def _coalesce_columns(df: pd.DataFrame, targets: dict) -> pd.DataFrame:
             pass
     return df
 
-# Build custom fonctions 
+# Build custom fonctions for IV
 def build_iv_diff_df(options: pd.DataFrame, otm_options: pd.DataFrame) -> pd.DataFrame:
     """
     Build dataframe matching the user's code, but tolerate older schemas:
@@ -68,7 +68,7 @@ def build_iv_diff_df(options: pd.DataFrame, otm_options: pd.DataFrame) -> pd.Dat
     opts = _standardize_cp_flag(opts)
     otm  = _standardize_cp_flag(otm)
 
-    # Coalesce column names
+    # column names
     opts = _coalesce_columns(opts, {
         "impl_volatility": ["implied_vol_bms", "impl_vol", "iv_provider"]
     })
@@ -108,9 +108,9 @@ def build_iv_diff_df(options: pd.DataFrame, otm_options: pd.DataFrame) -> pd.Dat
     df["iv_diff_pct"] = 100 * (df["impl_volatility"] / df["iv_bsm"] - 1)
     return df
 
-# ---- Plotting ----
+#  Plotting 
 def plot_iv_diff(df: pd.DataFrame):
-    # Select dates
+
     df_jan17 = df[df["date"] == pd.Timestamp("2020-01-17")].copy()
     df_mar20 = df[df["date"] == pd.Timestamp("2020-03-20")].copy()
 
@@ -120,7 +120,7 @@ def plot_iv_diff(df: pd.DataFrame):
     palette_cp = {"C": "steelblue", "P": "orange"}
     label_map = {"P": "Put (P)", "C": "Call (C)"}
 
-    # --- Jan 17, 2020 ---
+    #  Jan 17, 2020 
     sns.scatterplot(
         data=df_jan17,
         x="moneyness",
@@ -149,7 +149,7 @@ def plot_iv_diff(df: pd.DataFrame):
         title_fontsize=10
     )
 
-    # --- Mar 20, 2020 ---
+    #  Mar 20, 2020
     sns.scatterplot(
         data=df_mar20,
         x="moneyness",
@@ -182,12 +182,12 @@ def plot_iv_diff(df: pd.DataFrame):
     plt.tight_layout()
     return fig, axes
 
-# ---------- convenience ----------
+# convenience 
 def plot_from_raw(options: pd.DataFrame, otm_options: pd.DataFrame):
     df = build_iv_diff_df(options, otm_options)
     return plot_iv_diff(df)
 
-# ---------- allow `%run q4_a.py` ----------
+# 
 if __name__ == "__main__":
     if "options" not in globals() or "otm_options" not in globals():
         raise RuntimeError("Please define `options` and `otm_options` in the current session before running q4_a.py directly.")

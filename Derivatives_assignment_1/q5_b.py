@@ -7,6 +7,7 @@ import seaborn as sns
 from scipy.optimize import brentq
 from pathlib import Path
 
+# CRR option pricing
 def crr_price_stable(S, K, T, r, y, sigma, option_type="C", steps=2000, max_steps=600):
     if T <= 0:
         return max(0.0, (S-K) if option_type=="C" else (K-S))
@@ -35,6 +36,7 @@ def crr_price_stable(S, K, T, r, y, sigma, option_type="C", steps=2000, max_step
         payoff = disc * (p*payoff[1:] + (1.0 - p)*payoff[:-1])
     return float(payoff[0])
 
+# Compute implied volatility using CRR
 def implied_vol_crr_stable(S, K, T, r, y, market_price, option_type, steps, max_steps=600):
     def f(sig):
         return crr_price_stable(S, K, T, r, y, sig, option_type, steps=steps, max_steps=max_steps) - market_price
@@ -52,6 +54,7 @@ def implied_vol_crr_stable(S, K, T, r, y, market_price, option_type, steps, max_
     except Exception:
         return np.nan
 
+# Apply CRR IV calculation row by row
 def rows_iv_crr(df):
     iv = pd.Series(index=df.index, dtype=float)
     for idx, r in df.iterrows():
@@ -90,6 +93,8 @@ def _ensure_fields(options):
             if c in options.columns:
                 options[c] = pd.to_datetime(options[c]).dt.tz_localize(None).dt.normalize()
         return options
+
+# Main analysis and plotting
 
 def run_q5(options):
     options = options.copy()

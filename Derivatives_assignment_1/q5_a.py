@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import brentq
 
+
+#CRR option pricing
 def crr_price_stable(S, K, T, r, y, sigma, option_type="C", steps=2000, max_steps=600):
     if T <= 0:
         return max(0.0, (S - K) if option_type == "C" else (K - S))
@@ -31,6 +33,8 @@ def crr_price_stable(S, K, T, r, y, sigma, option_type="C", steps=2000, max_step
         payoff = disc * (p * payoff[1:] + (1.0 - p) * payoff[:-1])
     return float(payoff[0])
 
+
+# Compute implied volatility using CRR
 def implied_vol_crr_stable(S, K, T, r, y, market_price, option_type, steps, max_steps=600):
     def f(sig):
         return crr_price_stable(S, K, T, r, y, sig, option_type, steps=steps, max_steps=max_steps) - market_price
@@ -47,6 +51,8 @@ def implied_vol_crr_stable(S, K, T, r, y, market_price, option_type, steps, max_
         return brentq(f, lo, hi, xtol=1e-8, maxiter=200)
     except Exception:
         return np.nan
+    
+# Apply CRR IV row by row
 
 def rows_iv_crr(df: pd.DataFrame) -> pd.Series:
     iv = pd.Series(index=df.index, dtype=float)
